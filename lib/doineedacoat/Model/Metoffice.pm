@@ -73,20 +73,28 @@ sub get_weather_data {
 	my $res = $self->connection->get($metoffice_details->{url}. "val/wxfcs/all/json/" .
 		$site_details->{nearest_site_id} . "?res=3hourly"
 		. "&key=" . $self->{connection_info}{key});
-	     
-    my $json_string = decode_json($res->content);
-    open LOG, ">/tmp/jsonout";
-    
-    warn Dumper {
-		$json_string => $json_string
-	};
-	print LOG Dumper {
-		$json_string => $json_string
-	};
-	close LOG;
+	
+	if($res->is_success) {
+		my $json_string = decode_json($res->content);
+		open LOG, ">/tmp/jsonout";
 
-	#return $forecast_hash;
-	return 1
+		warn Dumper {
+			$json_string => $json_string
+		};
+		print LOG Dumper {
+			$json_string => $json_string
+		};
+		close LOG;
+
+		#return $forecast_hash;
+		return 1
+	}
+	else {
+		## FIXME: obviously do something more cleverer than this...
+		die "Something tragic happened in Metoffice.pm";
+	}
+	     
+    
 }
 
 

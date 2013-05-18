@@ -56,12 +56,17 @@ sub get_nearest_site_details {
     
     my $nearest_site_id = (sort {$proximity_hash->{$a} <=> $proximity_hash->{$b}} keys %$proximity_hash)[0];
     
-    my $site_details =  {
-        nearest_site_id => $nearest_site_id,
-        nearest_site_name => $site_to_name_hash->{$nearest_site_id}
-    };
-    return $site_details;
-    
+    if (defined $nearest_site_id) {
+        my $site_details =  {
+            nearest_site_id => $nearest_site_id,
+            nearest_site_name => $site_to_name_hash->{$nearest_site_id}
+        };
+        return $site_details;
+    }
+    else {
+        ## FIXME: figure out how to do a properly handled die
+        die "didn't get a site id";
+    }   
 }
 
 sub _NESW { deg2rad($_[0]), deg2rad(90 - $_[1]) }

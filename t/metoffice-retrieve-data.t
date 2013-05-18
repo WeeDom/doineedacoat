@@ -19,8 +19,8 @@ my $metoffice_details = $metoffice->_get_metoffice_info;
 my $site_id = 322185;
 	
 is(ref $conn, "LWP::UserAgent", "connection Looks like a lwp::ua?");
-my $res = $conn->get($metoffice_details->{url}. "val/wxfcs/all/xml/" . $site_id ."?res=3hourly"
-    . "&key=" .$metoffice->{connection_info}{key});
+my $res = $conn->get($metoffice_details->{url}. "val/wxfcs/all/json/" . $site_id ."?res=3hourly"
+    . "&key=" . $metoffice->{connection_info}{key});
 is(ref $res, 'HTTP::Response', "got some sort of response?");
 is($res->is_success, 1, "and it looked like a success");
 #is();
