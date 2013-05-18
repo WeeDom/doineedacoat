@@ -5,6 +5,15 @@
             <SPAN id="postcode_form_input_field">
                 <INPUT type="text" id="postcode" name="postcode">
             </SPAN>
+            <SPAN id="length_of_stay_title">Length of stay</SPAN>
+            <SPAN id="length_of_stay_span">
+                <SELECT id="length_of_stay_select">
+                    <OPTION id="length_of_stay_3" value="3">3 hours</OPTION>
+                    <OPTION id="length_of_stay_6" value="6">6 hours</OPTION>
+                    <OPTION id="length_of_stay_9" value="9">9 hours</OPTION>
+                    <OPTION id="length_of_stay_12" value="12">12 hours</OPTION>
+                </SELECT>
+            </SPAN>
             <SPAN id="postcode_form_input_field">
             <!-- type="submit"  -->
                 <INPUT type="button" id="postcode_submit" name="postcode_button" value="Do I Need A Coat???"
