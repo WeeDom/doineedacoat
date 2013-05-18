@@ -1,0 +1,8 @@
+--- 
+metoffice: 
+  url: http://datapoint.metoffice.gov.uk/public/data/
+  key: 5d59c327-4628-455f-84b8-b6bc6f5bdeee
+
+magicseaweed:
+  somethingelse: 3
+  otherbugger: weird

@@ -1,0 +1,15 @@
+<FORM id="postcode_form" action="/site/doineedacoat" method="post">
+    <DIV id="postcode_form_outer_div">
+        <DIV id="postcode_form_inner_div_1">
+            <SPAN id="postcode_form_title">Postcode</SPAN>
+            <SPAN id="postcode_form_input_field">
+                <INPUT type="text" id="postcode" name="postcode">
+            </SPAN>
+            <SPAN id="postcode_form_input_field">
+            <!-- type="submit"  -->
+                <INPUT type="button" id="postcode_submit" name="postcode_button" value="Do I Need A Coat???"
+                    onclick="javascript:usePointFromPostcode(document.getElementById('postcode').value)" >
+            </SPAN>                        
+        </DIV>
+    <DIV>
+</FORM>

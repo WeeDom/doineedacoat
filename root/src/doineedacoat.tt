@@ -1,0 +1,19 @@
+[% INCLUDE header.tt %]
+    <BODY>
+        <h1 id=''>Do I Need A Coat</h1>
+        <P id="intro1" class="paragraph">
+            Welcome to doineedacoat.com, possibly the most pointless site/sight/WebbSight on the internet.
+        </P>
+        <P id="intro2" class="paragraph">
+            I mean - really? Just look out of your window to decide
+whether you need a coat or not. But... if you're really too stupid to
+do even that then type your postcode in here, and I'll try to figure it 
+out for you (you dullard).
+        </P>
+        <P>
+            [% INCLUDE form.tt %]
+        </P>
+        <div id = "map" style="width: 500px;height: 500px"></div>
+    </BODY>
+
+</HTML>
