@@ -1,6 +1,8 @@
 package doineedacoat::Controller::Root;
 use Moose;
 use namespace::autoclean;
+use doineedacoat::Model::Metoffice;
+use Data::Dumper;
 
 BEGIN { extends 'Catalyst::Controller' }
 
@@ -31,6 +33,34 @@ sub index :Path :Args(0) {
 
     #$c->response->body()
     $c->stash(template => 'doineedacoat.tt'); 
+}
+
+=head2 doineedacoat
+
+shove the data up and down
+
+=cut
+
+sub doineedacoat :Local {
+    my ( $self, $c ) = @_;
+
+    my $metoffice = doineedacoat::Model::Metoffice->new();
+    
+    warn Dumper {
+        c_request => $c->request
+    };
+    
+    $metoffice->get_weather_data(
+        $c->request->parameters->{lat},
+        $c->request->parameters->{lng}
+    );
+
+    $c->stash(
+        username => 'WeeDom',
+        doineedacoat => "1",
+        postcode_field => $c->request->parameters->{postcode_field},
+        template => 'doineedacoat-response.tt'
+    );
 }
 
 =head2 default

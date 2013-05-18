@@ -9,7 +9,7 @@ use Data::Dumper;
 
 BEGIN {
 	use lib "/home/weedom/doineedacoat/lib/doineedacoat";
-	use_ok("Model::PostcodeTransform");	
+	use_ok("Model::Metoffice::PostcodeTransform");	
 };
 
 my $transformer = doineedacoat::Model::PostcodeTransform->new();
@@ -18,6 +18,8 @@ is(
 	ref $transformer, "doineedacoat::Model::PostcodeTransform",
 	"created a transformer?"
 );
+
+## lat/long now comes from google maps api
 
 my ($lat,$lng) = @{$transformer->transform("TR12 2QW")};
 

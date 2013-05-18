@@ -8,7 +8,7 @@ use Mojo::UserAgent;
 use Try::Tiny;
 use Data::Dumper;
 use YAML qw/LoadFile/;
-use doineedacoat::Model::PostcodeTransform;
+#use doineedacoat::Model::PostcodeTransform;
 
 our $SOURCES_FILE = "/home/weedom/doineedacoat/lib/doineedacoat/Model/sources";
 
@@ -53,10 +53,9 @@ sub _get_metoffice_info {
 }
 
 sub get_weather_data {
-	my ($self, $postcode) = @_;
+	my ($self, $lat, $lng) = @_;
 	
-	my $transformer = new doineedacoat::Model::PostcodeTransform;
-	my ($lat,$long) = @{$transformer->transform("TR11 2AN")};
+	## transform lat,lng into site_id
 	
 	my $res = $self->connection->get('http://datapoint.metoffice.gov.uk/public/data/val/wxfcs/all/json/3840?res=3hourly'
 		. "&key=" .$self->{connection_info}{key});
