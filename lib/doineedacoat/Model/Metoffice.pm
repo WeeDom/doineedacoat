@@ -4,16 +4,14 @@ use warnings;
 use strict;
 
 use Exporter;
-use Mojo::UserAgent;
+use LWP::UserAgent;
 use Try::Tiny;
 use Data::Dumper;
 use YAML qw/LoadFile/;
+use JSON;
 use doineedacoat::Model::Metoffice::LatLongTransform;
 
-
 our $SOURCES_FILE = "/home/weedom/doineedacoat/lib/doineedacoat/Model/sources";
-
-#our @EXPORT = qw/new/;
 
 our @ISA = qw//;
 
@@ -47,11 +45,13 @@ sub transformer {
 
 sub _connection {
 	my $self = shift;
-	my $ua = Mojo::UserAgent->new();
+	my $ua = LWP::UserAgent->new();
 	return $ua;
 	
 }
 
+## FIXME - this would be better if it was abstracted out, with a flag
+## to retrieve the data for each particular source. Maybe?
 sub _get_metoffice_info {
 	my $sources;
 	
@@ -61,17 +61,33 @@ sub _get_metoffice_info {
 }
 
 sub get_weather_data {
-	my ($self, $site_id) = @_;
+	my ($self, $lat,$lng) = @_;
+
+	my $site_details = $self->transformer->get_nearest_site_details(
+        $lat,
+        $lng
+    );
 
 	my $metoffice_details = _get_metoffice_info;
 	
-	my $res = $self->connection->get($metoffice_details->{url}. "val/wxfcs/all/xml/" . $site_id ."?res=3hourly"
-		. "&key=" .$self->{connection_info}{key});
-	warn Dumper {
-		 resContent => $res->content
+	my $res = $self->connection->get($metoffice_details->{url}. "val/wxfcs/all/json/" .
+		$site_details->{nearest_site_id} . "?res=3hourly"
+		. "&key=" . $self->{connection_info}{key});
+	     
+    my $json_string = decode_json($res->content);
+    open LOG, ">/tmp/jsonout";
+    
+    warn Dumper {
+		$json_string => $json_string
 	};
+	print LOG Dumper {
+		$json_string => $json_string
+	};
+	close LOG;
 
-	return $res;
+	#return $forecast_hash;
+	return 1
 }
+
 
 1;

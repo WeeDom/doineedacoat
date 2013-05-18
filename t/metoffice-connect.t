@@ -19,7 +19,7 @@ is(
 	"created a proper Metoffice object?"
 );
 my $connection = $metoffice->connection;
-is(ref $metoffice->connection,"Mojo::UserAgent", "Was metoffice->connection a MoJo:ua?");
+is(ref $metoffice->connection,"LWP::UserAgent", "Was metoffice->connection a LWP:ua?");
 ok($metoffice->connection->get("www.metoffice.gov.uk"), "pinged the metoffice website");
 
 done_testing();

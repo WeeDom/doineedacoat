@@ -46,21 +46,16 @@ sub doineedacoat :Local {
 
     my $metoffice = doineedacoat::Model::Metoffice->new();
 
-    my $site_details = $metoffice->transformer->get_nearest_site_details(
+    my $forecast = $metoffice->get_weather_data(
         $c->request->parameters->{lat},
         $c->request->parameters->{lng}
     );
-    
-    warn Dumper {
-      site_details => $site_details  
-    };
-    
-    my $forecast = $metoffice->get_weather_data($site_details->{nearest_site_id});
 
     $c->stash(
         username => 'WeeDom',
         doineedacoat => "1",
-        postcode_field => $c->request->parameters->{postcode_field},
+        postcode_field => $c->request->parameters->{postcode},
+        forecast => $forecast,
         template => 'doineedacoat-response.tt'
     );
 }

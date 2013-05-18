@@ -34,10 +34,11 @@ sub get_nearest_site_details {
         
     my @locations_array = sort { $$a{latitude} cmp $$b{latitude} } @{$locations_hash->{Locations}{Location}};
     
-    # 0.009 degrees difference in latitude =~ 1.001km north/south of current point
+    
     my $proximity_hash;
     my $site_to_name_hash;
  
+    # 0.009 degrees difference in latitude =~ 1.001km north/south of current point
     my $max_north = ($lat + (0.09 * 5));
     my $max_south = ($lat - (0.09 * 5));
 
