@@ -12,8 +12,7 @@ BEGIN {
 	use_ok("Model::Metoffice");	
 };
 
-my $metoffice = doineedacoat::Model::Metoffice->new();
-my $data = $metoffice->get_weather_data("TR11 2AN");
+
 #ok();
 
 done_testing();

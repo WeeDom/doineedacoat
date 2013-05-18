@@ -45,15 +45,17 @@ sub doineedacoat :Local {
     my ( $self, $c ) = @_;
 
     my $metoffice = doineedacoat::Model::Metoffice->new();
-    
-    warn Dumper {
-        c_request => $c->request
-    };
-    
-    $metoffice->get_weather_data(
+
+    my $site_details = $metoffice->transformer->get_nearest_site_details(
         $c->request->parameters->{lat},
         $c->request->parameters->{lng}
     );
+    
+    warn Dumper {
+      site_details => $site_details  
+    };
+    
+    my $forecast = $metoffice->get_weather_data($site_details->{nearest_site_id});
 
     $c->stash(
         username => 'WeeDom',

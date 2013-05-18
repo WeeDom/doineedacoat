@@ -8,6 +8,7 @@ use Mojo::UserAgent;
 use Try::Tiny;
 use Data::Dumper;
 use YAML qw/LoadFile/;
+use doineedacoat::Model::Metoffice::LatLongTransform;
 
 
 our $SOURCES_FILE = "/home/weedom/doineedacoat/lib/doineedacoat/Model/sources";
@@ -18,9 +19,11 @@ our @ISA = qw//;
 
 sub new {
 	my $class = shift;
+	my $transformer = doineedacoat::Model::Metoffice::LatLongTransform->new();
 	my $metoffice= {
 			connection => _connection(),
-			connection_info => _get_metoffice_info()
+			connection_info => _get_metoffice_info(),
+			transformer => $transformer
 	};
 	bless $metoffice,$class;
 	return $metoffice;
@@ -35,6 +38,11 @@ sub connection {
 sub key {
 	my $self = shift;
 	return $self->{connection_info}{key};
+}
+
+sub transformer {
+	my $self = shift;
+	return $self->{transformer};
 }
 
 sub _connection {
@@ -53,13 +61,15 @@ sub _get_metoffice_info {
 }
 
 sub get_weather_data {
-	my ($self, $lat, $lng) = @_;
-	
-	## transform lat,lng into site_id
-	
-	my $res = $self->connection->get('http://datapoint.metoffice.gov.uk/public/data/val/wxfcs/all/json/3840?res=3hourly'
-		. "&key=" .$self->{connection_info}{key});
+	my ($self, $site_id) = @_;
 
+	my $metoffice_details = _get_metoffice_info;
+	
+	my $res = $self->connection->get($metoffice_details->{url}. "val/wxfcs/all/xml/" . $site_id ."?res=3hourly"
+		. "&key=" .$self->{connection_info}{key});
+	warn Dumper {
+		 resContent => $res->content
+	};
 
 	return $res;
 }

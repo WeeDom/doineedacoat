@@ -13,7 +13,7 @@ BEGIN {
 };
 
 my $transformer = doineedacoat::Model::Metoffice::LatLongTransform->new();
-#print "did I create a transformer?\n";
+
 is(
 	ref $transformer, "doineedacoat::Model::Metoffice::LatLongTransform",
 	"created a transformer?"
@@ -31,7 +31,7 @@ my $lng = -5.073215;
 my $site_details = $transformer->get_nearest_site_details($lat,$lng);
 
 is($site_details->{nearest_site_name}, "Falmouth", "Was the nearest location Falmouth?");
-## actually, 351434 (Falmouth Bay) would do just as nicely
+
 is($site_details->{nearest_site_id}, 322185, "Was the nearest location id 322185?");
 
 done_testing();

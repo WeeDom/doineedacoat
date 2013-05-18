@@ -6,5 +6,5 @@ use Test::More;
 use Catalyst::Test 'doineedacoat';
 use doineedacoat::Controller::Site;
 
-ok( request('/site')->is_success, 'Request should succeed' );
+ok( request('/')->is_success, 'Request for /default should succeed' );
 done_testing();
