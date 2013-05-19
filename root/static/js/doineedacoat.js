@@ -3,7 +3,10 @@ var localSearch = new GlocalSearch();
 
 
 function processAndRedirect(lat,lng) {
-    window.location.replace("http://localhost:3000/doineedacoat?lat=" + lat + "&lng=" + lng);
+    window.location.replace("http://localhost:3000/doineedacoat?lat=" + 
+        lat + "&lng=" + 
+        lng + "&length_of_stay=" + 
+        $("#length_of_stay_select :selected").val());
 }
 
 function usePointFromPostcode(postcode, callbackFunction) {
