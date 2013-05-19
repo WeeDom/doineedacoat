@@ -75,27 +75,99 @@ sub get_weather_data {
 		. "&key=" . $self->{connection_info}{key});
 	
 	if($res->is_success) {
-		my $json_string = decode_json($res->content);
+		my $forecast_hash = decode_json($res->content);
 		open LOG, ">/tmp/jsonout";
-
-		warn Dumper {
-			$json_string => $json_string
-		};
-		print LOG Dumper {
-			$json_string => $json_string
-		};
+		print LOG $res->content;
 		close LOG;
-
-		#return $forecast_hash;
-		return 1
+		$self->_processForecast($forecast_hash);
 	}
 	else {
 		## FIXME: obviously do something more cleverer than this...
 		die "Something tragic happened in Metoffice.pm";
-	}
-	     
-    
+	}    
 }
+
+sub _processForecast {
+	my ($self, $forecast_hash, $length_of_stay) = @_;
+	my $doineedacoat = 0;
+	## set some thresholds
+	my $min_feels_like = 13;
+	my $max_pp_probability = 50;
+	## data looks a bit like this:
+	## labels:
+	#Param' => [
+	#{
+	#'$' => 'Feels Like Temperature',
+	#'name' => 'F',
+	#'units' => 'C'
+	#},
+	#{
+	#'$' => 'Wind Gust',
+	#'name' => 'G',
+	#'units' => 'mph'
+	#},
+	#{
+	#'$' => 'Screen Relative Humidity',
+	#'name' => 'H',
+	#'units' => '%'
+	#},
+	#{
+	#'$' => 'Temperature',
+	#'name' => 'T',
+	#'units' => 'C'
+	#},
+	#{
+	#'$' => 'Visibility',
+	#'name' => 'V',
+	#'units' => ''
+	#},
+	#{
+	#'$' => 'Wind Direction',
+	#'name' => 'D',
+	#'units' => 'compass'
+	#},
+	#{
+	#'$' => 'Wind Speed',
+	#'name' => 'S',
+	#'units' => 'mph'
+	#},
+	#{
+	#'$' => 'Max UV Index',
+	#'name' => 'U',
+	#'units' => ''
+	#},
+	#{
+	#'$' => 'Weather Type',
+	#'name' => 'W',
+	#'units' => ''
+	#},
+	#{
+	#'$' => 'Precipitation Probability',
+	#'name' => 'Pp',
+	#'units' => '%'
+	#}
+	#]
+	#},
+	#
+	## data:
+	#
+	#{
+	#'$' => '900',
+	#'S' => '11',
+	#'F' => '10',
+	#'W' => '3',
+	#'T' => '12',
+	#'V' => 'VG',
+	#'H' => '75',
+	#'Pp' => '2',
+	#'D' => 'NW',
+	#'G' => '25',
+	#'U' => '2'
+	#},
+	
+	return $doineedacoat;
+}
+
 
 
 1;
