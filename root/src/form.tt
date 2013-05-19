@@ -1,4 +1,4 @@
-<FORM id="postcode_form">
+<FORM id="postcode_form" onsubmit="javascript:usePointFromPostcode(document.getElementById('postcode').value)">
     <DIV id="postcode_form_outer_div">
         <DIV id="postcode_form_inner_div_1">
             <SPAN id="postcode_form_title">Postcode</SPAN>
