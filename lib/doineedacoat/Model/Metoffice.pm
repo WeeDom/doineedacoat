@@ -93,78 +93,48 @@ sub _processForecast {
 	## set some thresholds
 	my $min_feels_like = 13;
 	my $max_pp_probability = 50;
-	## data looks a bit like this:
-	## labels:
-	#Param' => [
-	#{
-	#'$' => 'Feels Like Temperature',
-	#'name' => 'F',
-	#'units' => 'C'
-	#},
-	#{
-	#'$' => 'Wind Gust',
-	#'name' => 'G',
-	#'units' => 'mph'
-	#},
-	#{
-	#'$' => 'Screen Relative Humidity',
-	#'name' => 'H',
-	#'units' => '%'
-	#},
-	#{
-	#'$' => 'Temperature',
-	#'name' => 'T',
-	#'units' => 'C'
-	#},
-	#{
-	#'$' => 'Visibility',
-	#'name' => 'V',
-	#'units' => ''
-	#},
-	#{
-	#'$' => 'Wind Direction',
-	#'name' => 'D',
-	#'units' => 'compass'
-	#},
-	#{
-	#'$' => 'Wind Speed',
-	#'name' => 'S',
-	#'units' => 'mph'
-	#},
-	#{
-	#'$' => 'Max UV Index',
-	#'name' => 'U',
-	#'units' => ''
-	#},
-	#{
-	#'$' => 'Weather Type',
-	#'name' => 'W',
-	#'units' => ''
-	#},
-	#{
-	#'$' => 'Precipitation Probability',
-	#'name' => 'Pp',
-	#'units' => '%'
-	#}
-	#]
-	#},
-	#
-	## data:
-	#
-	#{
-	#'$' => '900',
-	#'S' => '11',
-	#'F' => '10',
-	#'W' => '3',
-	#'T' => '12',
-	#'V' => 'VG',
-	#'H' => '75',
-	#'Pp' => '2',
-	#'D' => 'NW',
-	#'G' => '25',
-	#'U' => '2'
-	#},
+		
+	my $params = $forecast_hash->{SiteRep}{Wx}{Param}; ## readable labels
+	my $days = $forecast_hash->{SiteRep}{DV}{Location}{Period};
+		
+	my @humidity;
+	my @pp_precentages;
+	my @temperatures;
+	my @feels_like_temperatures;
+	my @wind_speed;
 	
+	my $hours_processed = 0;
+	my $all_done_here = 0;
+	foreach (@$days) {
+		my $daily_report_array = $_->{Rep};
+		foreach (@$daily_report_array) {
+			$hours_processed += 3;
+			my $report = $_;
+			push @humidity, $report->{H};
+			push @pp_precentages, $report->{Pp};
+			push @temperatures, $report->{T};
+			push @feels_like_temperatures, $report->{F};
+			push @wind_speed, $report->{Pp};			
+
+			if ($hours_processed >= $length_of_stay) {
+				$all_done_here = 1;
+				last;
+			}
+			else {
+				next;
+			}
+		}
+		last if $all_done_here;
+	}
+	## TODO - call another sub to process the means and generate a score
+	## NEARLY THERE!!
+	warn Dumper {
+		humidity => \@humidity,
+		pp_precentages => \@pp_precentages,
+		temperatures => \@temperatures,
+		feels_like_temperatures => \@feels_like_temperatures,
+		wind => \@wind_speed
+	};
 	return $doineedacoat;
 }
 

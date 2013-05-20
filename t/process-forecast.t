@@ -17,13 +17,8 @@ my $metoffice = doineedacoat::Model::Metoffice->new();
 
 ## use a blue-peter 3 hourly hash - here's one I prepared earlier
 my $metoffice_forecast = mockMetForecast();
-open(FAKEMETOFFICE, ">fakemetoffice-readable.txt");
-print FAKEMETOFFICE Dumper {
-   metoffice_forecast => $metoffice_forecast 
-};
-close FAKEMETOFFICE;
-
-my $yes_or_no = $metoffice->_processForecast($metoffice_forecast);
+my $length_of_stay = 9;
+my $yes_or_no = $metoffice->_processForecast($metoffice_forecast, $length_of_stay);
 is($yes_or_no,1,"You should take a coat");
 
 done_testing();
