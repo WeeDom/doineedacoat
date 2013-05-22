@@ -9,6 +9,7 @@ use Try::Tiny;
 use Data::Dumper;
 use YAML qw/LoadFile/;
 use JSON;
+use List::Util qw/sum/;
 use doineedacoat::Model::Metoffice::LatLongTransform;
 
 our $SOURCES_FILE = "/home/weedom/doineedacoat/lib/doineedacoat/Model/sources";
@@ -91,17 +92,19 @@ sub _processForecast {
 	my ($self, $forecast_hash, $length_of_stay) = @_;
 	my $doineedacoat = 0;
 	## set some thresholds
-	my $min_feels_like = 13;
-	my $max_pp_probability = 50;
+	my $thresholds = {
+		min_feels_like => 12,
+		max_pp_probability => 30
+	};
 		
 	my $params = $forecast_hash->{SiteRep}{Wx}{Param}; ## readable labels
 	my $days = $forecast_hash->{SiteRep}{DV}{Location}{Period};
 		
-	my @humidity;
-	my @pp_precentages;
-	my @temperatures;
-	my @feels_like_temperatures;
-	my @wind_speed;
+	my $humidity;
+	my $pp_percentages;
+	my $temperatures;
+	my $feels_like_temperatures;
+	my $wind_speed;
 	
 	my $hours_processed = 0;
 	my $all_done_here = 0;
@@ -110,11 +113,11 @@ sub _processForecast {
 		foreach (@$daily_report_array) {
 			$hours_processed += 3;
 			my $report = $_;
-			push @humidity, $report->{H};
-			push @pp_precentages, $report->{Pp};
-			push @temperatures, $report->{T};
-			push @feels_like_temperatures, $report->{F};
-			push @wind_speed, $report->{Pp};			
+			push @$humidity, $report->{H};
+			push @$pp_percentages, $report->{Pp};
+			push @$temperatures, $report->{T};
+			push @$feels_like_temperatures, $report->{F};
+			push @$wind_speed, $report->{S};			
 
 			if ($hours_processed >= $length_of_stay) {
 				$all_done_here = 1;
@@ -126,18 +129,55 @@ sub _processForecast {
 		}
 		last if $all_done_here;
 	}
-	## TODO - call another sub to process the means and generate a score
-	## NEARLY THERE!!
-	warn Dumper {
-		humidity => \@humidity,
-		pp_precentages => \@pp_precentages,
-		temperatures => \@temperatures,
-		feels_like_temperatures => \@feels_like_temperatures,
-		wind => \@wind_speed
-	};
-	return $doineedacoat;
+	
+	my $means = $self->_process_means(
+		{
+			humidity => $humidity,
+			pp_percentages => $pp_percentages,
+			temperatures => $temperatures,
+			feels_like_temperatures => $feels_like_temperatures,
+			wind => $wind_speed
+		}
+	);
+	
+	if (
+		($means->{mean_feels_like_temperature} lt $thresholds->{min_feels_like})
+		||
+		($means->{mean_temperature} lt $thresholds->{min_feels_like})
+	) {
+		$doineedacoat = 1;
+		return $doineedacoat;
+	}
+	
+	if($means->{mean_pp_percentage} gt $thresholds->{max_pp_probability}) {
+		$doineedacoat = 1;
+		return $doineedacoat;
+	}
+}
+
+sub _process_means {
+		my ($self, $args) = @_;
+		
+		my $mean_humidity = $self->_get_mean($args->{humidity});
+		my $mean_temperature = $self->_get_mean($args->{temperatures});
+		my $mean_feels_like_temperatures = $self->_get_mean($args->{feels_like_temperatures});
+		my $mean_pp_percentage = $self->_get_mean($args->{pp_percentages});
+		my $mean_wind = $self->_get_mean($args->{wind});
+		
+		return {
+			mean_humidity => $mean_humidity,
+			mean_pp_percentage => $mean_pp_percentage,
+			mean_temperature => $mean_temperature,
+			mean_feels_like_temperature => $mean_feels_like_temperatures,
+			mean_wind => $mean_wind
+		};
+}
+
+sub _get_mean {
+	my ($self,$measurements) = @_;
+	return sum(@{$measurements}) / @{$measurements};
 }
 
 
-
 1;
+

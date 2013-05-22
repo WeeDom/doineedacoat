@@ -28,7 +28,7 @@ sub mockMetForecast {
     {
         my $linebreak = $/;
         $/ = undef;
-        open(JSON, "./fakemetoffice.json");
+        open(JSON, "</home/weedom/doineedacoat/t/fakemetoffice.json");
         $json_string = <JSON>;
         close JSON;
         $/ = $linebreak;
