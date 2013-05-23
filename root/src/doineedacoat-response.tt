@@ -1,15 +1,11 @@
-[% USE Dumper %]
-
 [% INCLUDE header.tt %]
     <BODY>
-        <h1>form:</h1>
-        [%# Dumper.dump_html(parameters) %]
         <h1 id=''>Do I Need A Coat</h1>
         <P id="intro1" class="paragraph">
             Welcome to doineedacoat.com, possibly the most pointless site/sight/WebbSight on the internet.
         </P>
         <P id="intro2" class="paragraph">
-            I mean - really? FFS. Right - username: [% username %] ineedacoat = [% doineedacoat %]
+            I mean - really? FFS. Right -
         </P>
         <P>
             [% IF doineedacoat %]

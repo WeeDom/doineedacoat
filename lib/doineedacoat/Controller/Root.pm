@@ -31,33 +31,26 @@ The root page (/)
 sub index :Path :Args(0) {
     my ( $self, $c ) = @_;
 
-    #$c->response->body()
-    $c->stash(template => 'doineedacoat.tt'); 
-}
+    if(keys $c->request->parameters) {
+        my $metoffice = doineedacoat::Model::Metoffice->new();
+        warn "created a metoffice thingy";
+        my $doineedacoat = $metoffice->get_weather_data(
+            $c->request->parameters->{lat},
+            $c->request->parameters->{lng},
+            $c->request->parameters->{length_of_stay}
+        );
 
-=head2 doineedacoat
+        $c->stash(
+            doineedacoat => $doineedacoat,
+            #forecast => $forecast,
+            template => 'doineedacoat-response.tt'
+        );    
+    }
+    else{
+        $c->stash(template => 'doineedacoat.tt'); 
+    }
+    
 
-shove the data up and down
-
-=cut
-
-sub doineedacoat :Local {
-    my ( $self, $c ) = @_;
-
-    my $metoffice = doineedacoat::Model::Metoffice->new();
-
-    my $forecast = $metoffice->get_weather_data(
-        $c->request->parameters->{lat},
-        $c->request->parameters->{lng}
-    );
-
-    $c->stash(
-        username => 'WeeDom',
-        doineedacoat => "1",
-        postcode_field => $c->request->parameters->{postcode},
-        forecast => $forecast,
-        template => 'doineedacoat-response.tt'
-    );
 }
 
 =head2 default

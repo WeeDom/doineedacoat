@@ -62,7 +62,7 @@ sub _get_metoffice_info {
 }
 
 sub get_weather_data {
-	my ($self, $lat,$lng) = @_;
+	my ($self, $lat, $lng, $length_of_stay) = @_;
 
 	my $site_details = $self->transformer->get_nearest_site_details(
         $lat,
@@ -80,7 +80,8 @@ sub get_weather_data {
 		open LOG, ">/tmp/jsonout";
 		print LOG $res->content;
 		close LOG;
-		$self->_processForecast($forecast_hash);
+		my $doineedacoat = $self->_processForecast($forecast_hash, $length_of_stay);
+		return $doineedacoat;
 	}
 	else {
 		## FIXME: obviously do something more cleverer than this...
@@ -90,8 +91,7 @@ sub get_weather_data {
 
 sub _processForecast {
 	my ($self, $forecast_hash, $length_of_stay) = @_;
-	my $doineedacoat = 0;
-	## set some thresholds
+
 	my $thresholds = {
 		min_feels_like => 12,
 		max_pp_probability => 30
@@ -139,17 +139,18 @@ sub _processForecast {
 			wind => $wind_speed
 		}
 	);
-	
+
+	my $doineedacoat = 0;
 	if (
-		($means->{mean_feels_like_temperature} lt $thresholds->{min_feels_like})
+		($means->{mean_feels_like_temperature} <= $thresholds->{min_feels_like})
 		||
-		($means->{mean_temperature} lt $thresholds->{min_feels_like})
+		$means->{mean_feels_like_temperature} <= $thresholds->{min_feels_like}
 	) {
 		$doineedacoat = 1;
 		return $doineedacoat;
 	}
 	
-	if($means->{mean_pp_percentage} gt $thresholds->{max_pp_probability}) {
+	if($means->{mean_pp_percentage} >= $thresholds->{max_pp_probability}) {
 		$doineedacoat = 1;
 		return $doineedacoat;
 	}
