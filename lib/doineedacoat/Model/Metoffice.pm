@@ -3,12 +3,14 @@ package doineedacoat::Model::Metoffice;
 use warnings;
 use strict;
 
+use lib "/home/weedom/doineedacoat/lib/";
 use Exporter;
 use LWP::UserAgent;
 use Try::Tiny;
 use Data::Dumper;
 use YAML qw/LoadFile/;
 use JSON;
+use Encode;
 use List::Util qw/sum/;
 use doineedacoat::Model::Metoffice::LatLongTransform;
 
@@ -55,9 +57,7 @@ sub _connection {
 ## to retrieve the data for each particular source. Maybe?
 sub _get_metoffice_info {
 	my $sources;
-	
 	$sources = LoadFile("/home/weedom/doineedacoat/lib/doineedacoat/Model/sources");
-	
 	return $sources->{metoffice};
 }
 
@@ -84,8 +84,7 @@ sub get_weather_data {
 		return $doineedacoat;
 	}
 	else {
-		## FIXME: obviously do something more cleverer than this...
-		die "Something tragic happened in Metoffice.pm";
+		return $res->status_line;
 	}    
 }
 
@@ -179,6 +178,25 @@ sub _get_mean {
 	return sum(@{$measurements}) / @{$measurements};
 }
 
+sub _populate_site_list_db {
+	my ($self) = @_;
+
+	my $metoffice_details = _get_metoffice_info;
+	
+	warn Dumper {
+		url => $metoffice_details->{url} . "val/wxfcs/all/json/sitelist"
+	. "?key=" . $self->{connection_info}{key}
+	};
+		
+	my $res = $self->connection->get($metoffice_details->{url} . "val/wxfcs/all/json/sitelist"
+	. "?key=" . $self->{connection_info}{key});
+	
+	my $json_string = encode_utf8( $res->decoded_content );
+        
+    my $locations_hash = JSON->new->utf8->decode($json_string);
+	
+	return 0;
+}
 
 1;
 

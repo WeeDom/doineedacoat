@@ -6,7 +6,8 @@ use strict;
 use Exporter;
 use Try::Tiny;
 use Data::Dumper;
-use XML::Hash;
+use JSON;
+use Encode qw(encode_utf8);
 use Math::Trig qw(great_circle_distance deg2rad);
 
 sub new {
@@ -18,20 +19,19 @@ sub new {
 
 sub get_nearest_site_details {
     my ($self,$lat,$lng) = @_;
-    my $xml_to_hash = new XML::Hash;
-    my $xml_string;
+    my $json_string;
     
     {
         my $linebreak = $/;
         $/ = undef;
-        open(LOCATIONS_XML, "</home/weedom/doineedacoat/lib/doineedacoat/Model/metoffice-fullsites.xml");
-        $xml_string = <LOCATIONS_XML>;
-        close LOCATIONS_XML;
+        open(LOCATIONS_JSON, "</home/weedom/doineedacoat/lib/doineedacoat/Model/metoffice-fullsites.json");
+        $json_string = encode_utf8( <LOCATIONS_JSON> );
+        close LOCATIONS_JSON;
         $/ = $linebreak;
     }
     
-    my $locations_hash = $xml_to_hash->fromXMLStringtoHash($xml_string);
-        
+    my $locations_hash = JSON->new->utf8->decode($json_string);
+            
     my @locations_array = sort { $$a{latitude} cmp $$b{latitude} } @{$locations_hash->{Locations}{Location}};
     
     
