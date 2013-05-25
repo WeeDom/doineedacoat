@@ -39,12 +39,21 @@ sub index :Path :Args(0) {
             $c->request->parameters->{lng},
             $c->request->parameters->{length_of_stay}
         );
-
-        $c->stash(
-            doineedacoat => $doineedacoat,
-            #forecast => $forecast,
-            template => 'doineedacoat-response.tt'
-        );    
+        
+        if(ref $doineedacoat == 'HTTP::Response') {
+            $c->stash(
+                doineedacoat => $doineedacoat,
+                #forecast => $forecast,
+                template => 'doineedacoat-error.tt'
+            );
+        }
+        else {
+            $c->stash(
+                doineedacoat => $doineedacoat,
+                #forecast => $forecast,
+                template => 'doineedacoat-response.tt'
+            );
+        }
     }
     else{
         $c->stash(template => 'doineedacoat.tt'); 
