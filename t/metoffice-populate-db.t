@@ -1,6 +1,6 @@
 #! /usr/bin/perl
 
-## test connection to metoffice
+## test that we can populate a db with metoffice full-site info.
 
 use warnings;
 use strict;
@@ -21,7 +21,7 @@ is(
 my $connection = $metoffice->connection;
 is(ref $metoffice->connection,"LWP::UserAgent", "Was metoffice->connection a LWP:ua?");
 ok($metoffice->connection->get("www.metoffice.gov.uk"), "successfully-ish got the metoffice website (lwp::ua didn't return failure)");
-is($metoffice->_populate_site_list_db('test'), 1, "Successfully populated the met office 5000+ sites list");
+ok($metoffice->_populate_site_list_db('test'), "updated db");
 
 
 done_testing();
