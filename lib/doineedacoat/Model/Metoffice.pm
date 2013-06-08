@@ -181,21 +181,29 @@ sub _get_mean {
 sub _populate_site_list_db {
 	my ($self) = @_;
 
-	my $metoffice_details = _get_metoffice_info;
+    my $locations_hash = $self->_maybe_get_full_site_list();
+
+    return 0;
+}
+
+sub _maybe_get_full_site_list {
+    my ($self,$testing) = @_;
+    if(! $testing && ! _update_required()) {
+        return;
+    }
+	my $metoffice_details = _get_metoffice_info();
 	
-	warn Dumper {
-		url => $metoffice_details->{url} . "val/wxfcs/all/json/sitelist"
-	. "?key=" . $self->{connection_info}{key}
-	};
-		
-	my $res = $self->connection->get($metoffice_details->{url} . "val/wxfcs/all/json/sitelist"
+	my $res = $self->connection->get($self->{connection_info}->{url} . "val/wxfcs/all/json/sitelist"
 	. "?key=" . $self->{connection_info}{key});
+
+    my $locations_hash = JSON->new->utf8->decode(encode_utf8($res->decoded_content));
+
+    return $locations_hash  
 	
-	my $json_string = encode_utf8( $res->decoded_content );
-        
-    my $locations_hash = JSON->new->utf8->decode($json_string);
-	
-	return 0;
+}
+
+sub _update_required {
+    return 1;
 }
 
 1;

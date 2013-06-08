@@ -19,9 +19,22 @@ is(
 	"created a proper Metoffice object?"
 );
 my $connection = $metoffice->connection;
+
 is(ref $metoffice->connection,"LWP::UserAgent", "Was metoffice->connection a LWP:ua?");
-ok($metoffice->connection->get("www.metoffice.gov.uk"), "successfully-ish got the metoffice website (lwp::ua didn't return failure)");
-ok($metoffice->_populate_site_list_db('test'), "updated db");
+
+ok($metoffice->connection->get("www.metoffice.gov.uk"),
+    "got(ish) the metoffice website (lwp::ua didn't return failure)");
+
+my $full_site_list = $metoffice->_maybe_get_full_site_list(1)->{Locations}; 
+
+cmp_ok(
+    scalar $full_site_list, 
+    'gt',
+    4000,
+    "Got more than 4000 sites"
+);
+
+ok($metoffice->_populate_site_list_db($full_site_list), "updated db");
 
 
 done_testing();
