@@ -13,7 +13,7 @@ use JSON;
 use Encode;
 use List::Util qw/sum/;
 use doineedacoat::Model::Metoffice::LatLongTransform;
-
+use DBI;
 our $SOURCES_FILE = "/home/weedom/doineedacoat/lib/doineedacoat/Model/sources";
 
 our @ISA = qw//;
@@ -181,9 +181,45 @@ sub _get_mean {
 sub _populate_site_list_db {
 	my ($self) = @_;
 
-    my $locations_hash = $self->_maybe_get_full_site_list();
+    my $locations = 
+        $self->_maybe_get_full_site_list()->{Locations}{Location};
+    if(! $locations ) {
+        ## either we didn't bother getting a site list, or one wasn't available
+        ## nothing to do...
+        return 1;
+    }
+    else {
+        my $dbh = DBI->connect(
+            "dbi:Pg:dbname=doineedacoat",
+            "metoffice",
+            "b0ll0cks"
+        );
 
-    return 0;
+        my $rv = $dbh->do("DELETE FROM metoffice_sites");
+        my $rv2 = $dbh->do("alter sequence metoffice_id_seq restart with 1");
+        my $st = qq{
+            INSERT INTO metoffice_sites
+            (site_id, name, latitude, longitude)
+            VALUES (?,?,?,?)
+        };
+        eval {
+            my $sth = $dbh->prepare($st);
+            foreach (@$locations) {
+                $sth->execute(
+                    $_->{id},
+                    $_->{name},
+                    $_->{latitude},
+                    $_->{longitude},
+                );
+            }
+        };
+        if($@) {
+            die "_populate_site_list_db failed: $@";
+        }
+        else {
+            return 1;
+        }
+    }
 }
 
 sub _maybe_get_full_site_list {

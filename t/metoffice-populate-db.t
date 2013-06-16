@@ -34,7 +34,7 @@ cmp_ok(
     "Got more than 4000 sites"
 );
 
-ok($metoffice->_populate_site_list_db($full_site_list), "updated db");
+ok($metoffice->_populate_site_list_db(), "updated db");
 
 
 done_testing();
